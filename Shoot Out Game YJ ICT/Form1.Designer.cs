@@ -36,6 +36,11 @@
             this.GameTimer = new System.Windows.Forms.Timer(this.components);
             this.player = new System.Windows.Forms.PictureBox();
             this.label1 = new System.Windows.Forms.Label();
+            this.healthBar2 = new System.Windows.Forms.ProgressBar();
+            this.label3 = new System.Windows.Forms.Label();
+            this.txtScore2 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this.txtAmmo2 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.player)).BeginInit();
             this.SuspendLayout();
             // 
@@ -108,12 +113,69 @@
             this.label1.Text = "1player";
             this.label1.Click += new System.EventHandler(this.label1_Click);
             // 
+            // healthBar2
+            // 
+            this.healthBar2.Location = new System.Drawing.Point(838, 27);
+            this.healthBar2.Name = "healthBar2";
+            this.healthBar2.Size = new System.Drawing.Size(217, 23);
+            this.healthBar2.TabIndex = 7;
+            this.healthBar2.Value = 100;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Font = new System.Drawing.Font("굴림", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.label3.ForeColor = System.Drawing.Color.White;
+            this.label3.Location = new System.Drawing.Point(754, 27);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(80, 23);
+            this.label3.TabIndex = 3;
+            this.label3.Text = "Health:";
+            // 
+            // txtScore2
+            // 
+            this.txtScore2.AutoSize = true;
+            this.txtScore2.Font = new System.Drawing.Font("굴림", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.txtScore2.ForeColor = System.Drawing.Color.White;
+            this.txtScore2.Location = new System.Drawing.Point(668, 27);
+            this.txtScore2.Name = "txtScore2";
+            this.txtScore2.Size = new System.Drawing.Size(76, 23);
+            this.txtScore2.TabIndex = 4;
+            this.txtScore2.Text = "Kills: 0";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Font = new System.Drawing.Font("굴림", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.label5.ForeColor = System.Drawing.Color.White;
+            this.label5.Location = new System.Drawing.Point(555, 9);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(60, 13);
+            this.label5.TabIndex = 5;
+            this.label5.Text = "2player";
+            // 
+            // txtAmmo2
+            // 
+            this.txtAmmo2.AutoSize = true;
+            this.txtAmmo2.Font = new System.Drawing.Font("굴림", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.txtAmmo2.ForeColor = System.Drawing.Color.White;
+            this.txtAmmo2.Location = new System.Drawing.Point(557, 27);
+            this.txtAmmo2.Name = "txtAmmo2";
+            this.txtAmmo2.Size = new System.Drawing.Size(100, 23);
+            this.txtAmmo2.TabIndex = 6;
+            this.txtAmmo2.Text = "Ammo: 0";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.ClientSize = new System.Drawing.Size(1082, 1053);
+            this.Controls.Add(this.healthBar2);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.txtScore2);
+            this.Controls.Add(this.label5);
+            this.Controls.Add(this.txtAmmo2);
             this.Controls.Add(this.player);
             this.Controls.Add(this.healthBar);
             this.Controls.Add(this.label2);
@@ -139,6 +201,11 @@
         private System.Windows.Forms.PictureBox player;
         private System.Windows.Forms.Timer GameTimer;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.ProgressBar healthBar2;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label txtScore2;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label txtAmmo2;
     }
 }
 

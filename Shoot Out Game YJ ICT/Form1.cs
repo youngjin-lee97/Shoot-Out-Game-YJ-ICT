@@ -42,12 +42,18 @@ namespace Shoot_Out_Game_YJ_ICT
             client = c;
             stream = s;
 
-            otherPlayer.Image = Properties.Resources.left;
-            otherPlayer.SizeMode = PictureBoxSizeMode.AutoSize;
-            otherPlayer.Tag = isPlayer1 ? "player2" : "player1";
-            otherPlayer.Left = 700;
-            otherPlayer.Top = 300;
-            this.Controls.Add(otherPlayer);
+            if (isPlayer1)
+            {
+                player.Left = 100;
+                player.Top = 300;
+            }
+            else
+            {
+                player.Left = 700;
+                player.Top = 300;
+            }
+
+            otherPlayer = null;
 
             // 서버 수신 스레드 시작
             recvThread = new Thread(ReceiveData);
@@ -68,34 +74,32 @@ namespace Shoot_Out_Game_YJ_ICT
                     string msg = Encoding.UTF8.GetString(buffer, 0, bytes);
                     string[] data = msg.Split(',');
 
-                    if (data[0] == "POS" && data.Length == 3)
+                    if (data[0] == "POS" && data.Length == 4)
                     {
                         int x = int.Parse(data[1]);
                         int y = int.Parse(data[2]);
                         string dir = data[3];
 
-                        // 다른 플레이어 위치 이동 (UI 스레드로 실행)
                         this.Invoke(new Action(() =>
                         {
+                            if (otherPlayer == null)
+                            {
+                                otherPlayer = new PictureBox();
+                                otherPlayer.SizeMode = PictureBoxSizeMode.AutoSize;
+                                otherPlayer.Tag = "player2";
+                                this.Controls.Add(otherPlayer);
+                            }
+
                             otherPlayer.Left = x;
                             otherPlayer.Top = y;
+
                             switch (dir)
                             {
-                                case "up":
-                                    otherPlayer.Image = Properties.Resources.up;
-                                    break;
-                                case "down":
-                                    otherPlayer.Image = Properties.Resources.down;
-                                    break;
-                                case "left":
-                                    otherPlayer.Image = Properties.Resources.left;
-                                    break;
-                                case "right":
-                                    otherPlayer.Image = Properties.Resources.right;
-                                    break;
-                                case "dead":
-                                    otherPlayer.Image = Properties.Resources.dead;
-                                    break;
+                                case "up": otherPlayer.Image = Properties.Resources.up; break;
+                                case "down": otherPlayer.Image = Properties.Resources.down; break;
+                                case "left": otherPlayer.Image = Properties.Resources.left; break;
+                                case "right": otherPlayer.Image = Properties.Resources.right; break;
+                                case "dead": otherPlayer.Image = Properties.Resources.dead; break;
                             }
                         }));
                     }
@@ -103,7 +107,6 @@ namespace Shoot_Out_Game_YJ_ICT
             }
             catch
             {
-                // 서버 연결 끊김
                 this.Invoke(new Action(() =>
                 {
                     MessageBox.Show("서버 연결이 끊어졌습니다.");
@@ -132,6 +135,10 @@ namespace Shoot_Out_Game_YJ_ICT
 
                 e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
                 e.Graphics.DrawRectangle(borderpen, player1UI);
+
+                Rectangle player2UI = new Rectangle(480, 10, 450, 40);
+                e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+                e.Graphics.DrawRectangle(borderpen, player2UI);
             }
         }
 
@@ -146,9 +153,10 @@ namespace Shoot_Out_Game_YJ_ICT
             {
                 gameOver = true;
                 player.Image = Properties.Resources.dead;
-                GameTimer.Stop();
                 facing = "dead";
                 SendPosition();
+                GameTimer.Stop();
+                
             }
 
             txtAmmo.Text = "Ammo: " + ammo;
@@ -274,6 +282,7 @@ namespace Shoot_Out_Game_YJ_ICT
                 goLeft = true;
                 facing = "left";
                 player.Image = Properties.Resources.left;
+                SendPosition();
             }
 
             if (e.KeyCode == Keys.Right)
@@ -281,6 +290,7 @@ namespace Shoot_Out_Game_YJ_ICT
                 goRight = true;
                 facing = "right";
                 player.Image = Properties.Resources.right;
+                SendPosition();
             }
 
             if (e.KeyCode == Keys.Up)
@@ -288,6 +298,7 @@ namespace Shoot_Out_Game_YJ_ICT
                 goUp = true;
                 facing = "up";
                 player.Image = Properties.Resources.up;
+                SendPosition();
             }
 
             if (e.KeyCode == Keys.Down)
@@ -295,6 +306,7 @@ namespace Shoot_Out_Game_YJ_ICT
                 goDown = true;
                 facing = "down";
                 player.Image = Properties.Resources.down;
+                SendPosition();
             }
         }
 
