@@ -42,15 +42,12 @@ namespace Shoot_Out_Game_YJ_ICT
             client = c;
             stream = s;
 
-            if (!isPlayer1) 
-            {
-                otherPlayer.Image = Properties.Resources.left;
-                otherPlayer.SizeMode = PictureBoxSizeMode.AutoSize;
-                otherPlayer.Tag = "player2";
-                otherPlayer.Left = 700;
-                otherPlayer.Top = 300;
-                this.Controls.Add(otherPlayer);
-            }
+            otherPlayer.Image = Properties.Resources.left;
+            otherPlayer.SizeMode = PictureBoxSizeMode.AutoSize;
+            otherPlayer.Tag = isPlayer1 ? "player2" : "player1";
+            otherPlayer.Left = 700;
+            otherPlayer.Top = 300;
+            this.Controls.Add(otherPlayer);
 
             // 서버 수신 스레드 시작
             recvThread = new Thread(ReceiveData);
