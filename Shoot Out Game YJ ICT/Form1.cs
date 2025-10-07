@@ -72,12 +72,31 @@ namespace Shoot_Out_Game_YJ_ICT
                     {
                         int x = int.Parse(data[1]);
                         int y = int.Parse(data[2]);
+                        string dir = data[3];
 
                         // 다른 플레이어 위치 이동 (UI 스레드로 실행)
                         this.Invoke(new Action(() =>
                         {
                             otherPlayer.Left = x;
                             otherPlayer.Top = y;
+                            switch (dir)
+                            {
+                                case "up":
+                                    otherPlayer.Image = Properties.Resources.up;
+                                    break;
+                                case "down":
+                                    otherPlayer.Image = Properties.Resources.down;
+                                    break;
+                                case "left":
+                                    otherPlayer.Image = Properties.Resources.left;
+                                    break;
+                                case "right":
+                                    otherPlayer.Image = Properties.Resources.right;
+                                    break;
+                                case "dead":
+                                    otherPlayer.Image = Properties.Resources.dead;
+                                    break;
+                            }
                         }));
                     }
                 }
@@ -96,7 +115,7 @@ namespace Shoot_Out_Game_YJ_ICT
         {
             if (client == null || !client.Connected) return;
 
-            string msg = $"POS,{player.Left},{player.Top}";
+            string msg = $"POS,{player.Left},{player.Top},{facing}";
             byte[] data = Encoding.UTF8.GetBytes(msg);
             try
             {
@@ -128,6 +147,8 @@ namespace Shoot_Out_Game_YJ_ICT
                 gameOver = true;
                 player.Image = Properties.Resources.dead;
                 GameTimer.Stop();
+                facing = "dead";
+                SendPosition();
             }
 
             txtAmmo.Text = "Ammo: " + ammo;
