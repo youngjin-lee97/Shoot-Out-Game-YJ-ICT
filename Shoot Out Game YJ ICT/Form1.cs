@@ -5,12 +5,16 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
-using System.Net.Sockets;
-using System.Threading;
+using MySql.Data.MySqlClient;
+using Microsoft.VisualBasic;
+
+
 
 
 // WinForms 폼 클래스이다.
@@ -36,6 +40,29 @@ namespace Shoot_Out_Game_YJ_ICT
         Thread recvThread;
 
         PictureBox otherPlayer = new PictureBox(); // 상대 플레이어를 그릴 pictureBox (멀티플레이 표시용)
+
+        private string connStr = "Server=172.16.0.233;Database=game_rank;Uid=root;Pwd=1234;";
+
+
+        private void SaveRanking(string nickname, int kills)
+        {
+            try
+            {
+                using (MySqlConnection conn = new MySqlConnection(connStr))
+                {
+                    conn.Open();
+                    string sql = "INSERT INTO ranking (nickname, kills) VALUES (@nick, @kills)";
+                    MySqlCommand cmd = new MySqlCommand(sql, conn);
+                    cmd.Parameters.AddWithValue("@nick", nickname);
+                    cmd.Parameters.AddWithValue("@kills", kills);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("DB 저장 오류: " + ex.Message);
+            }
+        }
 
 
         public Form1(TcpClient c, NetworkStream s, bool isPlayer1)
@@ -111,6 +138,15 @@ namespace Shoot_Out_Game_YJ_ICT
                                 this.Controls.Add(otherPlayer); // otherplayer 라는 PictureBox를 이폼에 올려서 화면에 보이게 했다
                             }
 
+                            if (dir == "dead" || otherHealth <= 0)
+                            {
+                                otherPlayer.Image = Properties.Resources.dead;
+                                healthBar2.Value = 0;
+                                txtAmmo2.Text = $"Ammo: {otherAmmo}";
+                                txtScore2.Text = $"Kills: {otherScore}";
+                                return;
+                            }
+
 
                             // 상대 플레이어의 좌표이다.
                             // 받은 방향 문자열에 맞춰 스프라이트 이미지 갱신
@@ -130,6 +166,21 @@ namespace Shoot_Out_Game_YJ_ICT
                             txtAmmo2.Text = $"Ammo: {otherAmmo}";
                             txtScore2.Text = $"Kills: {otherScore}";
 
+                        }));
+                    }
+                    else if (data[0] == "BULLET" && data.Length == 4)
+                    {
+                        string dir = data[1];
+                        int bulletX = int.Parse(data[2]);
+                        int bulletY = int.Parse(data[3]);
+
+                        this.Invoke(new Action(() =>
+                        {
+                            Bullet otherBullet = new Bullet();
+                            otherBullet.direction = dir;
+                            otherBullet.bulletLeft = bulletX;
+                            otherBullet.bulletTop = bulletY;
+                            otherBullet.MakeBullet(this);  // 💥 상대방 총알 로컬 생성
                         }));
                     }
                 }
@@ -155,6 +206,18 @@ namespace Shoot_Out_Game_YJ_ICT
             try
             {
                 // 데이터를 서버에 보냄 ( stream 연결통로 )
+                stream.Write(data, 0, data.Length);
+            }
+            catch { }
+        }
+
+        private void SendBullet(string direction, int x, int y)
+        {
+            if (client == null || !client.Connected) return;
+            string msg = $"BULLET,{direction},{x},{y}";
+            byte[] data = Encoding.UTF8.GetBytes(msg);
+            try
+            {
                 stream.Write(data, 0, data.Length);
             }
             catch { }
@@ -195,7 +258,18 @@ namespace Shoot_Out_Game_YJ_ICT
                 facing = "dead";
                 SendPosition();
                 GameTimer.Stop();
-                
+
+                string nick = Microsoft.VisualBasic.Interaction.InputBox("닉네임을 입력하세요", "게임 오버", "Player");
+
+                if (!string.IsNullOrWhiteSpace(nick))
+                {
+                    SaveRanking(nick, score);
+                }
+
+
+                RankingForm rankForm = new RankingForm();
+                rankForm.ShowDialog();
+
             }
 
             // UI 텍스트 갱신
@@ -410,6 +484,8 @@ namespace Shoot_Out_Game_YJ_ICT
                 ammo--;
                 ShootBullet(facing);
                 SendPosition();
+
+                SendBullet(facing, player.Left + (player.Width / 2), player.Top + (player.Height / 2));
 
                 if (ammo < 1)
                 {

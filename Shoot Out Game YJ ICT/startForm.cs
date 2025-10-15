@@ -31,7 +31,8 @@ namespace Shoot_Out_Game_YJ_ICT
                 try
                 {
                     client = new TcpClient();
-                    client.Connect("211.185.150.248", 9000);
+                    //client.Connect("211.185.150.248", 9000);
+                    client.Connect("172.16.0.233", 9000);
                     stream = client.GetStream();
 
                     byte[] buffer = new byte[1024];
