@@ -86,11 +86,14 @@ namespace Shoot_Out_Game_YJ_ICT
                     string msg = Encoding.UTF8.GetString(buffer, 0, bytes);
                     string[] data = msg.Split(','); // 받은 문자열을 쉼표로 분리
 
-                    if (data[0] == "POS" && data.Length == 4) // 4개의 문자열을 받는다면
+                    if (data[0] == "POS" && data.Length == 7) // 4개의 문자열을 받는다면
                     {
                         int x = int.Parse(data[1]); // pos 다음 문자열부터 1
                         int y = int.Parse(data[2]); // 2
                         string dir = data[3]; // 3
+                        int otherHealth = int.Parse(data[4]);
+                        int otherAmmo = int.Parse(data[5]);
+                        int otherScore = int.Parse(data[6]);
 
 
 
@@ -122,6 +125,11 @@ namespace Shoot_Out_Game_YJ_ICT
                                 case "right": otherPlayer.Image = Properties.Resources.right; break;
                                 case "dead": otherPlayer.Image = Properties.Resources.dead; break;
                             }
+
+                            healthBar2.Text = $"HP: {otherHealth}";
+                            txtAmmo2.Text = $"Ammo: {otherAmmo}";
+                            txtScore2.Text = $"Kills: {otherScore}";
+
                         }));
                     }
                 }
@@ -142,7 +150,7 @@ namespace Shoot_Out_Game_YJ_ICT
             if (client == null || !client.Connected) return;
 
             // 보낼 데이터를 문자열로 조합
-            string msg = $"POS,{player.Left},{player.Top},{facing}";
+            string msg = $"POS,{player.Left},{player.Top},{facing},{playerHealth},{ammo},{score}";
             byte[] data = Encoding.UTF8.GetBytes(msg);
             try
             {
@@ -242,6 +250,7 @@ namespace Shoot_Out_Game_YJ_ICT
                     {
                         // 체력 -1
                         playerHealth -= 1;
+                        SendPosition();
                     }
 
                     // 좀비 이동//플레이어 데미지
@@ -281,6 +290,7 @@ namespace Shoot_Out_Game_YJ_ICT
 
                             // 점수 +
                             score++;
+                            SendPosition();
 
 
                             this.Controls.Remove(j); // 총알 제거
@@ -399,8 +409,9 @@ namespace Shoot_Out_Game_YJ_ICT
             {
                 ammo--;
                 ShootBullet(facing);
+                SendPosition();
 
-                if(ammo < 1)
+                if (ammo < 1)
                 {
                     DropAmmo();
                 }
